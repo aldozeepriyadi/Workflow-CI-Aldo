@@ -1,0 +1,48 @@
+name: ML Training CI with MLflow
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  train:
+    runs-on: ubuntu-latest
+
+    env:
+      MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
+      MLFLOW_TRACKING_USERNAME: ${{ secrets.MLFLOW_TRACKING_USERNAME }}
+      MLFLOW_TRACKING_PASSWORD: ${{ secrets.MLFLOW_TRACKING_PASSWORD }}
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    steps:
+    - name: Checkout Repo
+      uses: actions/checkout@v3
+
+    - name: Set up Conda
+      uses: conda-incubator/setup-miniconda@v2
+      with:
+        activate-environment: mlflow-env
+        environment-file: MLProject/conda.yaml
+        auto-activate-base: false
+
+    - name: Install mlflow cli
+      run: pip install mlflow
+
+    - name: Run MLflow Project
+      run: mlflow run MLProject
+
+    - name: Upload trained model artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: trained_model
+        path: MLProject/best_model_default.pkl
+
+    - name: Build Docker Image via MLflow
+      run: |
+        mlflow models build-docker -m ./MLProject/model_default -n personality-image
+        echo $DOCKERHUB_TOKEN | docker login -u $DOCKERHUB_USERNAME --password-stdin
+        docker tag personality-image $DOCKERHUB_USERNAME/personality-image:latest
+        docker push $DOCKERHUB_USERNAME/personality-image:latest
