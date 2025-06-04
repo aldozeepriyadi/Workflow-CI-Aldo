@@ -25,7 +25,6 @@ jobs:
           auto-activate-base: false
           activate-environment: mlflow-env
           environment-file: MLProject/conda.yaml
-          use-only-tar-bz2: true  # biar stabil
           python-version: 3.12  # versi matching dari conda.yaml
           
       - name: Check Env
