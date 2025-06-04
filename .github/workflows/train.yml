@@ -22,7 +22,8 @@ jobs:
           echo "export PATH=$HOME/anaconda3/bin:$PATH" >> ~/.bashrc
           source ~/.bashrc
           conda init bash
-          conda create -n mlflow python=3.12.2 -y
+          conda create -n mlflow python=3.12.2 -
+          conda init
           conda activate mlflow
           conda install -c conda-forge mlflow scikit-learn pandas numpy matplotlib seaborn joblib
 
