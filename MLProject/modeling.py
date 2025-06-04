@@ -13,7 +13,7 @@ import argparse
 # Load environment variable dari .env
 load_dotenv()
 parser = argparse.ArgumentParser()
-parser.add_argument("--data_path", type=str, default="Bank_Personal_Loan_preprocessing.csv")
+parser.add_argument("--data_path", type=str, default="preprocessed_dataset.csv")
 args = parser.parse_args()
 
 # Set DagsHub Tracking URI
