@@ -14,10 +14,10 @@ jobs:
       - name: Set up job
         uses: actions/checkout@v3
 
-      - name: Set up Python 3.12.7
+      - name: Set up Python 3.12.2
         uses: actions/setup-python@v4
         with:
-          python-version: '3.12.7'
+          python-version: '3.12.2'
           
       - name: Check Env
         run: |
@@ -33,7 +33,7 @@ jobs:
       - name: Upload dataset to the job
         run: |
           echo "Copying dataset for training..."
-          cp Workflow-CI-Aldo/MLProject/preprocessing/preprocessed_dataset.csv ./MLProject/
+          cp MLProject/preprocessing/preprocessed_dataset.csv ./MLProject/
 
       - name: Run mlflow project
         run: |
