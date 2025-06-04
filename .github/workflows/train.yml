@@ -33,6 +33,7 @@ jobs:
       - name: Check Conda Environment
         run: |
           conda info --envs  # Ensure the environment exists
+          conda init
           conda activate mlflow
           python --version
           pip --version
@@ -50,6 +51,7 @@ jobs:
 
       - name: Run mlflow project
         run: |
+          conda init
           conda activate mlflow
           mlflow run MLProject -P dataset_path=./MLProject/preprocessing/preprocessed_dataset.csv
           
