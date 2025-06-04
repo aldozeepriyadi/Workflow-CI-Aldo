@@ -7,9 +7,14 @@ import mlflow.sklearn
 from joblib import dump
 import os
 from dotenv import load_dotenv
+import argparse
+
 
 # Load environment variable dari .env
 load_dotenv()
+parser = argparse.ArgumentParser()
+parser.add_argument("--data_path", type=str, default="Bank_Personal_Loan_preprocessing.csv")
+args = parser.parse_args()
 
 # Set DagsHub Tracking URI
 mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI"))
