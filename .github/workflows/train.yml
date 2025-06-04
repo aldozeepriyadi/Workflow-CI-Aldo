@@ -14,41 +14,34 @@ jobs:
       - name: Set up job
         uses: actions/checkout@v3
 
-      - name: Install Conda
-        run: |
-          # Install Miniconda (this is necessary to setup Conda in the environment)
-          wget https://repo.anaconda.com/archive/Anaconda3-2022.05-Linux-x86_64.sh -O anaconda.sh
-          bash anaconda.sh -b
-          echo "export PATH=$HOME/anaconda3/bin:$PATH" >> ~/.bashrc
-          source ~/.bashrc
-          conda init bash  # Initialize Conda for the shell
-          source ~/.bashrc  # Reload the shell configuration to make sure Conda is available
-          conda activate base  # Activate the base environment
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12.2'
 
-      - name: Set up Conda environment
-        run: |
-          conda create -n mlflow-env python=3.12.2 -y
-          conda activate mlflow-env
-          conda install -c conda-forge mlflow scikit-learn pandas numpy matplotlib seaborn joblib
-
+      - name: Set up miniconda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          auto-activate-base: false
+          activate-environment: mlflow-env
+          environment-file: MLProject/conda.yaml
+          python-version: 3.12  # versi matching dari conda.yaml
+          
       - name: Check Env
         shell: bash -l {0}
         run: |
-          echo "Current working directory: $(pwd)"
-          echo "Python version: $(python --version)"
-          echo "MLflow version: $(mlflow --version)"
-          echo "Conda environment: $CONDA_DEFAULT_ENV"
-
-      - name: Install dependencies
-        run: |
-          pip install mlflow scikit-learn pandas numpy matplotlib seaborn joblib
-          if [ -f MLProject/requirements.txt ]; then pip install -r MLProject/requirements.txt; fi
+         echo "Current working directory: $(pwd)"
+         echo "Python version: $(python --version)"
+         echo "MLflow version: $(mlflow --version)"
+         echo "Conda environment: $CONDA_DEFAULT_ENV"
+        
+        
+          
 
       - name: Run mlflow project
         run: |
-          conda activate mlflow-env
-          mlflow run MLProject -P data_path=MLProject/preprocessing/preprocessed_dataset.csv
-
+          mlflow run MLProject -P data_path=preprocessed_dataset.csv
+          
       - name: Get latest MLflow run_id
         id: get_run_id
         run: |
@@ -56,13 +49,14 @@ jobs:
           RUN_ID=$(python -c "import mlflow; print(mlflow.search_runs(order_by=['start_time DESC']).iloc[0]['run_id'])")
           echo "run_id=$RUN_ID" >> $GITHUB_OUTPUT
           cd ..
-
+          
       - name: Upload model artifacts
         uses: actions/upload-artifact@v4
         with:
           name: model-artifacts
           path: MLProject/output/
-
+          
+          
       - name: Build Docker Model
         run: |
           cd MLProject
@@ -70,25 +64,25 @@ jobs:
           mlflow models build-docker \
             -m "runs:/${{ steps.get_run_id.outputs.run_id }}/model" \
             -n "personality:${GITHUB_SHA}"  # Updated to 'personality'
-
+          
       - name: Log in to Docker Hub
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-
+          
       - name: Tag Docker Image
         run: |
           docker tag personality:${GITHUB_SHA} ${{ secrets.DOCKER_USERNAME }}/personality:latest  # Updated to 'personality'
           docker tag personality:${GITHUB_SHA} ${{ secrets.DOCKER_USERNAME }}/personality:${GITHUB_SHA}  # Updated to 'personality'
-
+          
       - name: Push Docker Image
         run: |
           docker push ${{ secrets.DOCKER_USERNAME }}/personality:latest  # Updated to 'personality'
           docker push ${{ secrets.DOCKER_USERNAME }}/personality:${GITHUB_SHA}  # Updated to 'personality'
-
+          
       - name: Post Log in to Docker Hub
         run: echo "Docker image pushed successfully to Docker Hub"
-
+          
       - name: Complete job
         run: echo "Workflow completed successfully!"
