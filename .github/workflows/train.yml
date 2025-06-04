@@ -32,7 +32,7 @@ jobs:
 
     - name: Run training
       run: |
-        python MLProject/modelling.py
+        python MLProject/modeling.py
 
     - name: Upload trained model artifact
       uses: actions/upload-artifact@v2
