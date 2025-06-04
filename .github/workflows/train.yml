@@ -14,23 +14,13 @@ jobs:
       - name: Set up job
         uses: actions/checkout@v3
 
-      - name: Set up Conda Environment
+      - name: Set up Python 3.12.2
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12.2'
+          
+      - name: Check Env
         run: |
-          # Install Conda
-          wget https://repo.anaconda.com/archive/Anaconda3-2022.05-Linux-x86_64.sh -O anaconda.sh
-          bash anaconda.sh -b
-          echo "export PATH=$HOME/anaconda3/bin:$PATH" >> ~/.bashrc
-          source ~/.bashrc
-          conda init bash
-          conda create -n mlflow python=3.12.2 -
-          conda init
-          conda activate mlflow
-          conda install -c conda-forge mlflow scikit-learn pandas numpy matplotlib seaborn joblib
-
-      - name: Check Conda Environment
-        run: |
-          conda info --envs  # Ensure the environment exists
-          conda activate mlflow
           python --version
           pip --version
           
@@ -47,8 +37,7 @@ jobs:
 
       - name: Run mlflow project
         run: |
-          conda activate mlflow
-          mlflow run MLProject -P dataset_path=./MLProject/preprocessing/preprocessed_dataset.csv
+          mlflow run MLProject -P dataset_path=MLProject/preprocessing/preprocessed_dataset.csv
           
       - name: Get latest MLflow run_id
         id: get_run_id
@@ -63,6 +52,7 @@ jobs:
         with:
           name: model-artifacts
           path: MLProject/output/
+          
           
       - name: Build Docker Model
         run: |
