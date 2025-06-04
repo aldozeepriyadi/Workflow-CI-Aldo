@@ -32,12 +32,9 @@ jobs:
           python --version
           pip --version
           
-     
-  
-
       - name: Run mlflow project
         run: |
-          mlflow run MLProject -P data_path=preprocessed_dataset.csv
+          mlflow run MLProject
           
       - name: Get latest MLflow run_id
         id: get_run_id
