@@ -33,7 +33,7 @@ jobs:
       - name: Check Conda Environment
         run: |
           conda info --envs  # Ensure the environment exists
-          conda init
+          conda init mlflow
           conda activate mlflow
           python --version
           pip --version
