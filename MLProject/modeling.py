@@ -33,7 +33,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 
 # === Mulai MLflow run ===
 with mlflow.start_run(run_name="RandomForest_Default"):
-    mlflow.autolog()
+   
 
     model = RandomForestClassifier(random_state=42)
     model.fit(X_train, y_train)
