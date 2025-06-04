@@ -6,29 +6,16 @@ import mlflow
 import mlflow.sklearn
 from joblib import dump
 import os
-from dotenv import load_dotenv
 import argparse
 
 
-# Load environment variable dari .env
-load_dotenv()
+# Parsing argument dari command line
 parser = argparse.ArgumentParser()
 parser.add_argument("--data_path", type=str, default="preprocessed_dataset.csv")
 args = parser.parse_args()
 
-# Set DagsHub Tracking URI
-mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI"))
-
-# Set credentials ke environment variable agar dikenali mlflow
-os.environ["MLFLOW_TRACKING_USERNAME"] = os.getenv("MLFLOW_TRACKING_USERNAME")
-os.environ["MLFLOW_TRACKING_PASSWORD"] = os.getenv("MLFLOW_TRACKING_PASSWORD")
-
-# Gunakan nama eksperimen yang baru atau bersihkan sebelumnya
-experiment_name = "Eksperimen_Kriteria2_DagsHub"
-mlflow.set_experiment(experiment_name)
-
 # === Load data ===
-data = pd.read_csv("preprocessing/preprocessed_dataset.csv")
+data = pd.read_csv(args.data_path)
 X = data.drop("Personality", axis=1)
 y = data["Personality"]
 
@@ -38,7 +25,6 @@ X_train, X_test, y_train, y_test = train_test_split(
 
 # === Mulai MLflow run ===
 with mlflow.start_run(run_name="RandomForest_Default"):
-   
 
     model = RandomForestClassifier(random_state=42)
     model.fit(X_train, y_train)
@@ -55,6 +41,7 @@ with mlflow.start_run(run_name="RandomForest_Default"):
     # Log model ke DagsHub
     mlflow.sklearn.log_model(model, "model_default")
 
+    # Log metrics
     mlflow.log_metrics({
         "accuracy": acc,
         "precision": prec,

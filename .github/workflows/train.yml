@@ -33,14 +33,11 @@ jobs:
           pip install mlflow scikit-learn pandas numpy matplotlib seaborn joblib
           if [ -f MLProject/requirements.txt ]; then pip install -r MLProject/requirements.txt; fi
           
-      - name: Upload dataset to the job
-        run: |
-          echo "Copying dataset for training..."
-          cp MLProject/preprocessing/preprocessed_dataset.csv ./MLProject/
+  
 
       - name: Run mlflow project
         run: |
-          conda activate mlflow run MLProject -P dataset_path=MLProject/preprocessing/preprocessed_dataset.csv
+          mlflow run MLproject --env-manager=local
           
       - name: Get latest MLflow run_id
         id: get_run_id
