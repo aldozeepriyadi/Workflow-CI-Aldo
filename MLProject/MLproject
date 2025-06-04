@@ -5,5 +5,5 @@ conda_env: conda.yaml
 entry_points:
   main:
     parameters:
-      data_path: {type: str, default: "preprocessing/preprocessed_dataset.csv"}
+      data_path: {type: str, default: "./MLProject/preprocessing/preprocessed_dataset.csv"}
     command: "python modeling.py --data_path {data_path}"
