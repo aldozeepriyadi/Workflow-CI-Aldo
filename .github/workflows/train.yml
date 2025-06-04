@@ -14,18 +14,22 @@ jobs:
       - name: Set up job
         uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.12.2'
+      - name: Install Conda
+        run: |
+          # Install Miniconda (this is necessary to setup Conda in the environment)
+          wget https://repo.anaconda.com/archive/Anaconda3-2022.05-Linux-x86_64.sh -O anaconda.sh
+          bash anaconda.sh -b
+          echo "export PATH=$HOME/anaconda3/bin:$PATH" >> ~/.bashrc
+          source ~/.bashrc
+          conda init bash  # Initialize Conda for the shell
+          source ~/.bashrc  # Reload the shell configuration to make sure Conda is available
+          conda activate base  # Activate the base environment
 
-      - name: Set up miniconda
-        uses: conda-incubator/setup-miniconda@v2
-        with:
-          auto-activate-base: false
-          activate-environment: mlflow-env
-          environment-file: MLProject/conda.yaml
-          python-version: 3.12.2
+      - name: Set up Conda environment
+        run: |
+          conda create -n mlflow-env python=3.12.2 -y
+          conda activate mlflow-env
+          conda install -c conda-forge mlflow scikit-learn pandas numpy matplotlib seaborn joblib
 
       - name: Check Env
         shell: bash -l {0}
@@ -42,7 +46,6 @@ jobs:
 
       - name: Run mlflow project
         run: |
-          # Ensure the environment is activated using conda
           conda activate mlflow-env
           mlflow run MLProject -P data_path=MLProject/preprocessing/preprocessed_dataset.csv
 
