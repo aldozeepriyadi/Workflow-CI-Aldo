@@ -1,4 +1,4 @@
-name: ML Training CI with MLflow
+name: Advanced ML CI with MLflow + Docker
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  train:
+  train_and_deploy:
     runs-on: ubuntu-latest
 
     env:
@@ -21,26 +21,26 @@ jobs:
     - name: Checkout Repo
       uses: actions/checkout@v3
 
-    - name: Set up Conda
-      uses: conda-incubator/setup-miniconda@v2
+    - name: Setup Python
+      uses: actions/setup-python@v4
       with:
-        activate-environment: mlflow-env
-        environment-file: MLProject/conda.yaml
-        auto-activate-base: false
+        python-version: '3.12.2'
 
-    - name: Install mlflow cli
-      run: pip install mlflow
+    - name: Install dependencies
+      run: |
+        pip install mlflow cloudpickle numpy pandas psutil scikit-learn scipy python-dotenv
 
-    - name: Run MLflow Project
-      run: mlflow run MLProject
+    - name: Run training
+      run: |
+        python MLProject/modelling.py
 
     - name: Upload trained model artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v2
       with:
         name: trained_model
         path: MLProject/best_model_default.pkl
 
-    - name: Build Docker Image via MLflow
+    - name: Build Docker image from MLflow model
       run: |
         mlflow models build-docker -m ./MLProject/model_default -n personality-image
         echo $DOCKERHUB_TOKEN | docker login -u $DOCKERHUB_USERNAME --password-stdin
