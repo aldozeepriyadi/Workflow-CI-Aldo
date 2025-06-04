@@ -19,7 +19,7 @@ os.environ["MLFLOW_TRACKING_USERNAME"] = os.getenv("MLFLOW_TRACKING_USERNAME")
 os.environ["MLFLOW_TRACKING_PASSWORD"] = os.getenv("MLFLOW_TRACKING_PASSWORD")
 
 # Gunakan nama eksperimen yang baru atau bersihkan sebelumnya
-experiment_name = "Eksperimen_Kriteria2_DagsHub"
+experiment_name = "Eksperimen_Kriteria3_Advanced"
 mlflow.set_experiment(experiment_name)
 
 # === Load data ===
@@ -50,9 +50,27 @@ with mlflow.start_run(run_name="RandomForest_Default"):
     # Log model ke DagsHub
     mlflow.sklearn.log_model(model, "model_default")
 
+    # Log metrics
     mlflow.log_metrics({
         "accuracy": acc,
         "precision": prec,
         "recall": rec,
         "f1_score": f1
     })
+
+    # Membuat Docker Image dari Model MLflow
+    model_uri = f"runs:/{mlflow.active_run().info.run_id}/model_default"
+    mlflow.models.build_docker(model_uri, "personality-model")
+
+    # Menyimpan model ke Docker Hub
+    docker_image_tag = f"{os.getenv('DOCKERHUB_USERNAME')}/personality-model:{mlflow.active_run().info.run_id}"
+    mlflow.log_artifact("best_model_default.pkl", artifact_path="model_artifacts")
+
+    print(f"Model saved as Docker image: {docker_image_tag}")
+
+    # Menyimpan ke Docker Hub
+    os.system(f"docker build -t {docker_image_tag} .")
+    os.system(f"docker login -u {os.getenv('DOCKERHUB_USERNAME')} -p {os.getenv('DOCKERHUB_TOKEN')}")
+    os.system(f"docker push {docker_image_tag}")
+    
+    print(f"Docker image pushed successfully: {docker_image_tag}")
