@@ -26,6 +26,7 @@ jobs:
       - name: Set up Conda environment
         run: |
           conda create -n mlflow python=3.12.2 -y
+          conda init
           conda activate mlflow
           conda install -c conda-forge mlflow scikit-learn pandas numpy matplotlib seaborn joblib
 
