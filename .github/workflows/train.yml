@@ -35,7 +35,8 @@ jobs:
       - name: Install MLFlow
         run: |
           pip install mlflow 
-          conda activate mlflow
+          conda init
+          conda activate 
 
         
           
