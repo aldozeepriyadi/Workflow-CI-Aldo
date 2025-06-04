@@ -5,7 +5,6 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 import mlflow
 import mlflow.sklearn
 from joblib import dump
-import os
 import argparse
 
 
