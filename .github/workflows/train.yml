@@ -37,7 +37,7 @@ jobs:
 
       - name: Run mlflow project
         run: |
-          python -m mlflow run ./MLProject --env-manager=local -P dataset_path=MLProject/preprocessing/preprocessed_dataset.csv
+          mlflow run MLProject -P dataset_path=MLProject/preprocessing/preprocessed_dataset.csv
           
       - name: Get latest MLflow run_id
         id: get_run_id
