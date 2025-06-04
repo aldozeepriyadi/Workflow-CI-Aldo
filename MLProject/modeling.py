@@ -19,7 +19,7 @@ os.environ["MLFLOW_TRACKING_USERNAME"] = os.getenv("MLFLOW_TRACKING_USERNAME")
 os.environ["MLFLOW_TRACKING_PASSWORD"] = os.getenv("MLFLOW_TRACKING_PASSWORD")
 
 # Gunakan nama eksperimen yang baru atau bersihkan sebelumnya
-experiment_name = "Eksperimen_Kriteria3_Advanced"
+experiment_name = "Eksperimen_Kriteria2_DagsHub"
 mlflow.set_experiment(experiment_name)
 
 # === Load data ===
