@@ -14,13 +14,25 @@ jobs:
       - name: Set up job
         uses: actions/checkout@v3
 
-      - name: Set up Python 3.12.2
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.12.2'
-          
-      - name: Check Env
+      - name: Install Conda
         run: |
+          # Install Conda
+          wget https://repo.anaconda.com/archive/Anaconda3-2022.05-Linux-x86_64.sh -O anaconda.sh
+          bash anaconda.sh -b
+          echo "export PATH=$HOME/anaconda3/bin:$PATH" >> ~/.bashrc
+          source ~/.bashrc
+          conda init bash
+
+      - name: Set up Conda environment
+        run: |
+          conda create -n mlflow python=3.12.2 -y
+          conda activate mlflow
+          conda install -c conda-forge mlflow scikit-learn pandas numpy matplotlib seaborn joblib
+
+      - name: Check Conda Environment
+        run: |
+          conda info --envs  # Ensure the environment exists
+          conda activate mlflow
           python --version
           pip --version
           
@@ -29,12 +41,16 @@ jobs:
           python -m pip install --upgrade pip
           pip install mlflow scikit-learn pandas numpy matplotlib seaborn joblib
           if [ -f MLProject/requirements.txt ]; then pip install -r MLProject/requirements.txt; fi
-          
-      
+
+      - name: Upload dataset to the job
+        run: |
+          echo "Copying dataset for training..."
+          cp MLProject/preprocessing/preprocessed_dataset.csv ./MLProject/
 
       - name: Run mlflow project
         run: |
-          mlflow run MLProject -P data_path=./MLProject/preprocessing/preprocessed_dataset.csv
+          conda activate mlflow
+          mlflow run MLProject -P dataset_path=./MLProject/preprocessing/preprocessed_dataset.csv
           
       - name: Get latest MLflow run_id
         id: get_run_id
@@ -49,7 +65,6 @@ jobs:
         with:
           name: model-artifacts
           path: MLProject/output/
-          
           
       - name: Build Docker Model
         run: |
