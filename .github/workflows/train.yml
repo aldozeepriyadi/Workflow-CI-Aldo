@@ -40,6 +40,8 @@ jobs:
 
       - name: Run mlflow project
         run: |
+          conda init
+          conda activate mlflow
           mlflow run MLProject -P dataset_path=MLProject/preprocessing/preprocessed_dataset.csv
           
       - name: Get latest MLflow run_id
