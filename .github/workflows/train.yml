@@ -53,7 +53,7 @@ jobs:
         run: |
           cd MLProject
           echo "Getting run_id from run_id.txt"
-          RUN_ID=$(cat MLProject/run_id.txt)  # Read the run_id from the file
+          RUN_ID=$(cat run_id.txt)  # Read the run_id from the file
           echo "run_id=$RUN_ID" >> $GITHUB_OUTPUT  # Store the run_id in GitHub Actions' output variable
           
       - name: Upload model artifacts
