@@ -8,6 +8,7 @@ import joblib
 import os
 import warnings
 
+
 class MLModel:
     def __init__(self):
         self.model = RandomForestClassifier()
@@ -88,9 +89,10 @@ if __name__ == '__main__':
         # Save local model
         model.save_model("RandomForest_v3.joblib")
 
-        # Log run_id
+        # Log run_id to a text file
         run_id = mlflow_run.info.run_id
-        mlflow.log_param("run_id", run_id)  # Log the run_id as a parameter
+        with open("run_id.txt", "w") as f:
+            f.write(run_id)  # Save the run_id to the file
         print(f"MLflow run completed with run_id: {run_id}")
 
     # End run if we started it

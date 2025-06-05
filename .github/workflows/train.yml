@@ -51,6 +51,7 @@ jobs:
         shell: bash -l {0}
         id: get_run_id
         run: |
+          cd MLProject
           echo "Getting run_id from MLflow..."
           RUN_ID=$(python -c "import mlflow; print(mlflow.active_run().info.run_id)")  # Get run_id directly from MLflow active run
           echo "run_id=$RUN_ID" >> $GITHUB_OUTPUT  # Store the run_id in GitHub Actions' output variable
@@ -58,6 +59,7 @@ jobs:
       - name: Verify MLflow Run
         shell: bash -l {0}
         run: |
+          cd MLProject
           echo "Checking if the run_id exists in MLflow..."
           RUN_ID="${{ steps.get_run_id.outputs.run_id }}"
           mlflow_runs=$(python -c "import mlflow; runs = mlflow.search_runs(order_by=['start_time DESC']); print(runs[runs['run_id'] == '${RUN_ID}'].shape[0])")
