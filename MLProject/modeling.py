@@ -23,7 +23,11 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 
 # === Mulai MLflow run ===
-with mlflow.start_run(run_name="RandomForest_Default"):
+with mlflow.start_run(run_name="RandomForest_Default") as run: 
+    
+    # Log the run_id for reference
+    run_id = run.info.run_id
+    print(f"Started MLflow run with run_id: {run_id}")
 
     model = RandomForestClassifier(random_state=42)
     model.fit(X_train, y_train)
@@ -47,3 +51,6 @@ with mlflow.start_run(run_name="RandomForest_Default"):
         "recall": rec,
         "f1_score": f1
     })
+    
+    # Log the run_id to the MLflow run
+    mlflow.log_param("run_id", run_id)  # You can log the run_id as a parameter if needed
