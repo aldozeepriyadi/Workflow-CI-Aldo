@@ -28,6 +28,10 @@ with mlflow.start_run(run_name="RandomForest_Default") as run:
     # Log the run_id for reference
     run_id = run.info.run_id
     print(f"Started MLflow run with run_id: {run_id}")
+     # Save the run_id to a text file
+    with open("run_id.txt", "w") as f:
+        f.write(run_id)
+
 
     model = RandomForestClassifier(random_state=42)
     model.fit(X_train, y_train)

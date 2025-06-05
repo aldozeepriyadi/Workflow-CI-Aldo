@@ -52,11 +52,9 @@ jobs:
         id: get_run_id
         run: |
           cd MLProject
-          # Cek apakah ada run yang valid
-          RUN_ID=$(python -c "import mlflow; runs = mlflow.search_runs(order_by=['start_time DESC']); print(runs.iloc[0]['run_id'] if len(runs) > 0 else 'No runs')")
-          echo "run_id=$RUN_ID" >> $GITHUB_OUTPUT  # Simpan output run_id
-          cd ..
-
+          echo "Getting run_id from run_id.txt"
+          RUN_ID=$(cat MLProject/run_id.txt)  # Read the run_id from the file
+          echo "run_id=$RUN_ID" >> $GITHUB_OUTPUT  # Store the run_id in GitHub Actions' output variable
           
       - name: Upload model artifacts
         uses: actions/upload-artifact@v4
