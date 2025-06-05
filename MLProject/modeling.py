@@ -48,7 +48,7 @@ if __name__ == '__main__':
     warnings.filterwarnings("ignore")
 
     # train and test set paths
-    data_path = os.path.join(os.path.dirname(__file__), "preprocessed_dataset.csv")
+    data_path = os.path.join(os.path.dirname(__file__), "preprocessing/preprocessed_dataset.csv")
 
     # model initialization
     model = MLModel()
