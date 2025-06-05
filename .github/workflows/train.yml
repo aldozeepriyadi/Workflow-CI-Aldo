@@ -67,7 +67,9 @@ jobs:
             echo "Error: Run ID does not exist in MLflow!"
             exit 1
           else
+            echo RUN_ID
             echo "Run ID exists, continuing with the process..."
+            
           fi
           
       - name: Upload model artifacts
