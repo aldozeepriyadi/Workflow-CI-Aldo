@@ -8,41 +8,40 @@ import joblib
 import os
 import warnings
 
-
 class MLModel:
-        def __init__(self):
-               self.model = RandomForestClassifier()
+    def __init__(self):
+        self.model = RandomForestClassifier()
 
-        def load_data(self, data_path):
-               """Load preprocessed data from a CSV file."""
-               df = pd.read_csv(data_path)
-               return df
-        
-        def split_X_y(self, df):
-               """Split the DataFrame into features and target variable."""
-               X = df.drop(columns=['Personality'])
-               y = df['Personality']
-               return X, y
+    def load_data(self, data_path):
+        """Load preprocessed data from a CSV file."""
+        df = pd.read_csv(data_path)
+        return df
 
-        def train(self, X_train, y_train):
-                """Train the model."""
-                self.model.fit(X_train, y_train)
-                return self.model
+    def split_X_y(self, df):
+        """Split the DataFrame into features and target variable."""
+        X = df.drop(columns=['Personality'])
+        y = df['Personality']
+        return X, y
 
-        def evaluate(self, X_test, y_test):
-                """Evaluate the model."""
-                y_pred = self.model.predict(X_test)
-                acc = accuracy_score(y_test, y_pred)
-                prec = precision_score(y_test, y_pred, average="macro")
-                rec = recall_score(y_test, y_pred, average="macro")
-                f1 = f1_score(y_test, y_pred, average="macro")
-                return acc, prec, rec, f1
+    def train(self, X_train, y_train):
+        """Train the model."""
+        self.model.fit(X_train, y_train)
+        return self.model
 
-        def save_model(self, path):
-                joblib.dump(self.model, path)
+    def evaluate(self, X_test, y_test):
+        """Evaluate the model."""
+        y_pred = self.model.predict(X_test)
+        acc = accuracy_score(y_test, y_pred)
+        prec = precision_score(y_test, y_pred, average="macro")
+        rec = recall_score(y_test, y_pred, average="macro")
+        f1 = f1_score(y_test, y_pred, average="macro")
+        return acc, prec, rec, f1
 
-        def load_model(self, path):
-                self.model = joblib.load(path)
+    def save_model(self, path):
+        joblib.dump(self.model, path)
+
+    def load_model(self, path):
+        self.model = joblib.load(path)
 
 if __name__ == '__main__':
     warnings.filterwarnings("ignore")
@@ -88,6 +87,11 @@ if __name__ == '__main__':
 
         # Save local model
         model.save_model("RandomForest_v3.joblib")
+
+        # Log run_id
+        run_id = mlflow_run.info.run_id
+        mlflow.log_param("run_id", run_id)  # Log the run_id as a parameter
+        print(f"MLflow run completed with run_id: {run_id}")
 
     # End run if we started it
     active_run = mlflow.active_run()
