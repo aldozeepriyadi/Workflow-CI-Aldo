@@ -55,6 +55,20 @@ jobs:
           echo "Getting run_id from run_id.txt"
           RUN_ID=$(cat run_id.txt)  # Read the run_id from the file
           echo "run_id=$RUN_ID" >> $GITHUB_OUTPUT  # Store the run_id in GitHub Actions' output variable
+
+        
+      - name: Verify MLflow Run
+        shell: bash -l {0}
+        run: |
+          echo "Checking if the run_id exists in MLflow..."
+          RUN_ID=$(cat MLProject/run_id.txt)  # Get the run_id from the file
+          mlflow_runs=$(python -c "import mlflow; runs = mlflow.search_runs(order_by=['start_time DESC']); print(runs[runs['run_id'] == '${RUN_ID}'].shape[0])")
+          if [ "$mlflow_runs" -eq 0 ]; then
+            echo "Error: Run ID does not exist in MLflow!"
+            exit 1
+          else
+            echo "Run ID exists, continuing with the process..."
+          fi
           
       - name: Upload model artifacts
         uses: actions/upload-artifact@v4
