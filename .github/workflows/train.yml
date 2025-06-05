@@ -17,7 +17,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.12.2'
+          python-version: '3.12.7'
 
       - name: Set up miniconda
         uses: conda-incubator/setup-miniconda@v2
@@ -25,7 +25,7 @@ jobs:
           auto-activate-base: false
           activate-environment: mlflow-env
           environment-file: MLProject/conda.yaml
-          python-version: 3.12.2  # versi matching dari conda.yaml
+          python-version: 3.12.7  # versi matching dari conda.yaml
           
       - name: Check Env
         shell: bash -l {0}
@@ -62,7 +62,6 @@ jobs:
       - name: Build Docker Model
         shell: bash -l {0}
         run: |
-          cd MLProject
           echo "Building Docker image for run_id: ${{ steps.get_run_id.outputs.run_id }}"
           mlflow models build-docker -m "runs:/${{ steps.get_run_id.outputs.run_id }}/model" -n "personality:${GITHUB_SHA}"
 
