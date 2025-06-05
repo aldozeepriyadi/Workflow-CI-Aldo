@@ -62,10 +62,12 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: model-artifacts
-          path: MLProject/output/
+          path: MLProject/mlruns/
+          retention-days: 30
           
           
       - name: Build Docker Model
+        shell: bash -l {0}
         run: |
           cd MLProject
           # Build Docker image directly using MLflow
@@ -80,11 +82,13 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
           
       - name: Tag Docker Image
+        shell: bash -l {0}
         run: |
           docker tag personality:${GITHUB_SHA} ${{ secrets.DOCKER_USERNAME }}/personality:latest  # Updated to 'personality'
           docker tag personality:${GITHUB_SHA} ${{ secrets.DOCKER_USERNAME }}/personality:${GITHUB_SHA}  # Updated to 'personality'
           
       - name: Push Docker Image
+        shell: bash -l {0}
         run: |
           docker push ${{ secrets.DOCKER_USERNAME }}/personality:latest  # Updated to 'personality'
           docker push ${{ secrets.DOCKER_USERNAME }}/personality:${GITHUB_SHA}  # Updated to 'personality'
