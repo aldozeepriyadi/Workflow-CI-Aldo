@@ -6,7 +6,7 @@ import mlflow
 import mlflow.sklearn
 from joblib import dump
 import argparse
-
+import os
 
 # Parsing argument dari command line
 parser = argparse.ArgumentParser()
@@ -23,8 +23,8 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 
 # === Mulai MLflow run ===
-with mlflow.start_run(run_name="RandomForest_Default") as run: 
-    
+with mlflow.start_run(run_name="RandomForest_Default") as run:
+
     # Log the run_id for reference
     run_id = run.info.run_id
     print(f"Started MLflow run with run_id: {run_id}")
@@ -33,15 +33,16 @@ with mlflow.start_run(run_name="RandomForest_Default") as run:
     model.fit(X_train, y_train)
     y_pred = model.predict(X_test)
 
+    # Metrics
     acc = accuracy_score(y_test, y_pred)
     prec = precision_score(y_test, y_pred, average="macro")
     rec = recall_score(y_test, y_pred, average="macro")
     f1 = f1_score(y_test, y_pred, average="macro")
 
-    # Simpan model secara relatif
+    # Save model
     dump(model, "best_model_default.pkl")
 
-    # Log model ke DagsHub
+    # Log model to MLflow
     mlflow.sklearn.log_model(model, "model_default")
 
     # Log metrics
@@ -51,6 +52,7 @@ with mlflow.start_run(run_name="RandomForest_Default") as run:
         "recall": rec,
         "f1_score": f1
     })
-    
-    # Log the run_id to the MLflow run
-    mlflow.log_param("run_id", run_id)  # You can log the run_id as a parameter if needed
+
+    # Ensure run_id is being logged
+    mlflow.log_param("run_id", run_id)  # Log the run_id as a parameter
+    print(f"MLflow run completed with run_id: {run_id}")
