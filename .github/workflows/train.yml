@@ -71,14 +71,14 @@ jobs:
       - name: Tag Docker Image
         shell: bash -l {0}
         run: |
-          docker tag personality:${GITHUB_SHA} ${{ secrets.DOCKER_USERNAME }}/personality:latest  # Updated to 'personality'
-          docker tag personality:${GITHUB_SHA} ${{ secrets.DOCKER_USERNAME }}/personality:${GITHUB_SHA}  # Updated to 'personality'
-          
+          docker tag personality:${GITHUB_SHA} ${{ secrets.DOCKERHUB_USERNAME }}/personality:latest
+          docker tag personality:${GITHUB_SHA} ${{ secrets.DOCKERHUB_USERNAME }}/personality:${GITHUB_SHA}
+
       - name: Push Docker Image
         shell: bash -l {0}
         run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/personality:latest  # Updated to 'personality'
-          docker push ${{ secrets.DOCKER_USERNAME }}/personality:${GITHUB_SHA}  # Updated to 'personality'
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/personality:latest  # Updated to 'personality'
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/personality:${GITHUB_SHA}  # Updated to 'personality'
           
       - name: Post Log in to Docker Hub
         run: echo "Docker image pushed successfully to Docker Hub"
