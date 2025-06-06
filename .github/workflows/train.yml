@@ -53,7 +53,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: model-artifacts
-          path: MLProject/mlruns/
+          path: MLProject
           retention-days: 30
 
       - name: Build Docker Model
