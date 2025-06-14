@@ -35,6 +35,7 @@ jobs:
          echo "MLflow version: $(mlflow --version)"
          echo "Conda environment: $CONDA_DEFAULT_ENV"
 
+
       - name: Run mlflow project
         shell: bash -l {0}
         run: |
@@ -48,15 +49,7 @@ jobs:
           RUN_ID=$(cat MLProject/run_id.txt)  # Read the run_id from the file
           echo "run_id=$RUN_ID" >> $GITHUB_OUTPUT  # Store the run_id in GitHub Actions' output variable
 
-      - name: Upload model artifacts to GitHub Repository
-        run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@users.noreply.github.com"
-          git add MLProject/
-          git commit -m "Add model artifacts"
-          git push origin main  # Sesuaikan dengan branch yang sesuai
-
-      - name: Upload model artifacts to GitHub Actions Artifact Storage
+      - name: Upload model artifacts
         uses: actions/upload-artifact@v4
         with:
           name: model-artifacts
@@ -75,6 +68,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           
+      
       - name: Tag Docker Image
         shell: bash -l {0}
         run: |
