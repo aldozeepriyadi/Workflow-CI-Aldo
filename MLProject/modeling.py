@@ -68,8 +68,6 @@ if __name__ == '__main__':
 
         model.save_model("RandomForest_v3.joblib")
 
-        # Save run_id to file in MLProject folder (for CI/CD)
-        os.makedirs("MLProject", exist_ok=True)
         run_id = run.info.run_id
         with open("run_id.txt", "w") as f:
             f.write(run_id)
