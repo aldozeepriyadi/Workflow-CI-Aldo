@@ -2,7 +2,8 @@ name: ML Model Training Workflow
 
 on:
   push:
-    branches: [ main ]
+    branches:  
+     - main 
   workflow_dispatch:
 
 jobs:
@@ -35,6 +36,7 @@ jobs:
          echo "MLflow version: $(mlflow --version)"
          echo "Conda environment: $CONDA_DEFAULT_ENV"
 
+
       - name: Run mlflow project
         shell: bash -l {0}
         run: |
@@ -54,27 +56,27 @@ jobs:
         with:
           name: model-artifacts
           path: |
-            MLProject/mlruns
+            MLProject
           retention-days: 30
 
       - name: Verify model artifacts
         run: |
           ls -R MLProject/mlruns
 
-      # Gantilah bagian ini untuk menggunakan Dockerfile
-      - name: Build Docker Image from Dockerfile
+      - name: Build Docker Model
         shell: bash -l {0}
         run: |
           cd MLProject
           echo "Building Docker image for run_id: ${{ steps.get_run_id.outputs.run_id }}"
-          docker build -t personality:${GITHUB_SHA} .  # Membangun Docker image dari Dockerfile yang ada
-
+          mlflow models build-docker -m "runs:/${{ steps.get_run_id.outputs.run_id }}/model" -n "personality:${GITHUB_SHA}" 
+             
       - name: Log in to Docker Hub
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-
+          
+      
       - name: Tag Docker Image
         shell: bash -l {0}
         run: |
