@@ -112,6 +112,7 @@ jobs:
           
       - name: Post Log in to Docker Hub
         run: echo "Docker image pushed successfully to Docker Hub"
+   
           
       - name: Complete job
         run: echo "Workflow completed successfully!" | head -1)
