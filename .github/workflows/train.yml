@@ -60,7 +60,7 @@ jobs:
 
       - name: Verify model artifacts
         run: |
-          ls -R MLProject/mlruns
+          ls -R mlruns
 
       - name: Build Docker Model
         shell: bash -l {0}
