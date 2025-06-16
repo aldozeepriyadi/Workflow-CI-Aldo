@@ -89,25 +89,85 @@ jobs:
           cd MLProject
           echo "Building Docker image for run_id: ${{ steps.get_run_id.outputs.run_id }}"
           
-          # Verify model exists before building
-          MODEL_PATH="runs:/${{ steps.get_run_id.outputs.run_id }}/model"
-          echo "Checking if model exists at: $MODEL_PATH"
+          # Get experiment ID from mlruns directory
+          EXPERIMENT_ID=$(ls mlruns/ | grep -E '^[0-9]+
+             
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
           
-          # Try to get model info first
-          mlflow models describe -m "$MODEL_PATH" || {
-            echo "ERROR: Model not found at $MODEL_PATH"
-            echo "Available runs:"
-            mlflow runs list
+      - name: Tag Docker Image
+        shell: bash -l {0}
+        run: |
+          docker tag personality:${GITHUB_SHA} ${{ secrets.DOCKERHUB_USERNAME }}/personality:latest
+          docker tag personality:${GITHUB_SHA} ${{ secrets.DOCKERHUB_USERNAME }}/personality:${GITHUB_SHA}
+
+      - name: Push Docker Image
+        shell: bash -l {0}
+        run: |
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/personality:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/personality:${GITHUB_SHA}
+          
+      - name: Post Log in to Docker Hub
+        run: echo "Docker image pushed successfully to Docker Hub"
+          
+      - name: Complete job
+        run: echo "Workflow completed successfully!" | head -1)
+          echo "Found experiment ID: $EXPERIMENT_ID"
+          
+          # Verify model artifacts exist in file system
+          MODEL_ARTIFACTS_PATH="mlruns/$EXPERIMENT_ID/${{ steps.get_run_id.outputs.run_id }}/artifacts/model"
+          echo "Checking model artifacts at: $MODEL_ARTIFACTS_PATH"
+          
+          if [ -d "$MODEL_ARTIFACTS_PATH" ]; then
+            echo "✓ Model artifacts directory found"
+            echo "Contents:"
+            ls -la "$MODEL_ARTIFACTS_PATH"
+            
+            # Check for required files
+            if [ -f "$MODEL_ARTIFACTS_PATH/MLmodel" ]; then
+              echo "✓ MLmodel file found"
+              echo "MLmodel contents:"
+              cat "$MODEL_ARTIFACTS_PATH/MLmodel"
+            else
+              echo "✗ MLmodel file missing!"
+              exit 1
+            fi
+            
+            if [ -f "$MODEL_ARTIFACTS_PATH/model.pkl" ]; then
+              echo "✓ model.pkl file found"
+            else
+              echo "✗ model.pkl file missing!"
+              exit 1
+            fi
+          else
+            echo "✗ Model artifacts directory not found at: $MODEL_ARTIFACTS_PATH"
+            echo "Available directories in mlruns/$EXPERIMENT_ID/:"
+            ls -la "mlruns/$EXPERIMENT_ID/" 2>/dev/null || echo "Experiment directory not found"
             exit 1
-          }
+          fi
           
           # Build Docker image
-          echo "Model verified, building Docker image..."
-          mlflow models build-docker -m "$MODEL_PATH" -n "personality:${GITHUB_SHA}" --enable-mlserver || {
-            echo "ERROR: Docker build failed"
-            echo "Trying alternative build method..."
-            mlflow models build-docker -m "$MODEL_PATH" -n "personality:${GITHUB_SHA}"
-          }
+          MODEL_PATH="runs:/${{ steps.get_run_id.outputs.run_id }}/model"
+          echo "Building Docker image with model path: $MODEL_PATH"
+          
+          # Try building Docker image
+          if mlflow models build-docker -m "$MODEL_PATH" -n "personality:${GITHUB_SHA}"; then
+            echo "✓ Docker image built successfully"
+          else
+            echo "✗ Docker build failed, trying without mlserver..."
+            if mlflow models build-docker -m "$MODEL_PATH" -n "personality:${GITHUB_SHA}" --no-mlserver; then
+              echo "✓ Docker image built successfully (without mlserver)"
+            else
+              echo "✗ Docker build failed completely"
+              echo "Checking MLflow version and available commands:"
+              mlflow --version
+              mlflow models --help
+              exit 1
+            fi
+          fi
              
       - name: Log in to Docker Hub
         uses: docker/login-action@v1

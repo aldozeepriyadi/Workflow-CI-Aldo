@@ -105,13 +105,16 @@ def main(data_path=None):
             signature = infer_signature(X_test, y_pred)
             
             # CRITICAL: Log model with proper artifact path
+            print("Logging model to MLflow...")
             mlflow.sklearn.log_model(
                 sk_model=ml_model.model,
                 artifact_path="model",  # This must be "model" for Docker build
                 input_example=X_train.iloc[:5],  # Use iloc for proper indexing
                 signature=signature,
-                registered_model_name="PersonalityModel"
+                registered_model_name="PersonalityModel",
+                serialization_format="cloudpickle"  # Ensure proper serialization
             )
+            print("✓ Model logged to MLflow")
             
             # Save additional artifacts
             model_filename = "RandomForest_v3.joblib"
