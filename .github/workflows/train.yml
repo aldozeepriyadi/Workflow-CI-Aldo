@@ -39,7 +39,8 @@ jobs:
       - name: Run mlflow project
         shell: bash -l {0}
         run: |
-          mlflow run MLProject -P data_path=preprocessing/preprocessed_dataset.csv
+          cd MLProject
+          mlflow run . -P data_path=preprocessing/preprocessed_dataset.csv
           
       - name: Get latest MLflow run_id
         shell: bash -l {0}
@@ -54,7 +55,7 @@ jobs:
         with:
           name: model-artifacts
           path: |
-            MLProject/mlruns
+            mlruns
           retention-days: 30
 
       - name: Build Docker Model
