@@ -55,8 +55,12 @@ jobs:
         with:
           name: model-artifacts
           path: |
-            mlruns
+            MLProject/mlruns
           retention-days: 30
+
+      - name: Verify model artifacts
+        run: |
+          ls -R MLProject/mlruns
 
       - name: Build Docker Model
         shell: bash -l {0}
