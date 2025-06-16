@@ -40,7 +40,6 @@ jobs:
       - name: Run mlflow project
         shell: bash -l {0}
         run: |
-          cd MLProject
           mlflow run . -P data_path=preprocessing/preprocessed_dataset.csv
           
       - name: Get latest MLflow run_id
@@ -55,8 +54,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: model-artifacts
-          path: |
-            MLProject
           retention-days: 30
 
       - name: Verify model artifacts
@@ -66,7 +63,6 @@ jobs:
       - name: Build Docker Model
         shell: bash -l {0}
         run: |
-          cd MLProject
           echo "Building Docker image for run_id: ${{ steps.get_run_id.outputs.run_id }}"
           mlflow models build-docker -m "runs:/${{ steps.get_run_id.outputs.run_id }}/model" -n "personality:${GITHUB_SHA}" 
              
