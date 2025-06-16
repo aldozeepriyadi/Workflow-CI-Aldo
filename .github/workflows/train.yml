@@ -35,7 +35,6 @@ jobs:
          echo "MLflow version: $(mlflow --version)"
          echo "Conda environment: $CONDA_DEFAULT_ENV"
 
-
       - name: Run mlflow project
         shell: bash -l {0}
         run: |
@@ -62,20 +61,20 @@ jobs:
         run: |
           ls -R MLProject/mlruns
 
-      - name: Build Docker Model
+      # Gantilah bagian ini untuk menggunakan Dockerfile
+      - name: Build Docker Image from Dockerfile
         shell: bash -l {0}
         run: |
           cd MLProject
           echo "Building Docker image for run_id: ${{ steps.get_run_id.outputs.run_id }}"
-          mlflow models build-docker -m "runs:/${{ steps.get_run_id.outputs.run_id }}/model" -n "personality:${GITHUB_SHA}" 
-             
+          docker build -t personality:${GITHUB_SHA} .  # Membangun Docker image dari Dockerfile yang ada
+
       - name: Log in to Docker Hub
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-          
-      
+
       - name: Tag Docker Image
         shell: bash -l {0}
         run: |
